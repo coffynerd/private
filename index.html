@@ -4,411 +4,629 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Świąteczne Plany</title>
-    <!-- Import Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Import czcionek Google (Lobster dla klimatu, Inter dla czytelności) -->
+
+    <!-- Import czcionek Google (nadal potrzebne) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
-    
+
+    <!--
+      ZMIANA: Usunięto Tailwind CSS.
+      Wszystkie style są teraz zdefiniowane poniżej.
+    -->
     <style>
-        /* Aplikowanie niestandardowych czcionek */
+        /* --- Style Główne --- */
         body {
             font-family: 'Inter', sans-serif;
-            /* Zmienione tło na subtelny zielony wzór */
+            background-color: #f3f4f6; /* bg-gray-100 */
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem; /* p-4 */
+            /* Tło w paski */
             background-image: url('data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="40" height="40" viewBox="0 0 40 40"%3E%3Cg fill-rule="evenodd"%3E%3Cg fill="%23166534" fill-opacity="0.1"%3E%3Cpath d="M0 40L40 0H20L0 20M40 40V20L20 40"/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');
         }
+
         .font-lobster {
             font-family: 'Lobster', cursive;
         }
-        /* Style dla aktywnej zakładki */
-        .tab-active {
-            border-bottom-color: #dc2626; /* red-600 */
-            color: #dc2626;
-            font-weight: 700;
-        }
-        /* Style dla komórek kalendarza */
-        .calendar-day {
-            min-height: 100px;
-        }
+
         /* Ukrywanie widoków */
         .view-hidden {
             display: none;
         }
+
+        /* --- Kontener Aplikacji --- */
+        .app-container {
+            background-color: #ffffff;
+            border-radius: 1rem; /* rounded-2xl */
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* shadow-xl */
+            width: 100%;
+            max-width: 32rem; /* max-w-lg */
+            margin: 0 auto;
+            overflow: hidden;
+        }
+
+        /* --- Nagłówek --- */
+        .app-header {
+            padding: 1.5rem 2rem; /* p-6 md:p-8 */
+            background-color: #b91c1c; /* bg-red-700 */
+            color: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .app-header h1 {
+            font-family: 'Lobster', cursive;
+            font-size: 2.25rem; /* text-4xl */
+            line-height: 2.5rem;
+        }
+
+        /* --- Główna zawartość (formularz i reszta) --- */
+        .app-content {
+            padding: 1.5rem 2rem; /* p-6 md:p-8 */
+        }
+
+        /* --- Formularz --- */
+        .form-container {
+            display: grid;
+            gap: 1rem; /* space-y-4 */
+        }
+        .form-container label {
+            display: block;
+            font-size: 0.875rem; /* text-sm */
+            font-weight: 500; /* font-medium */
+            color: #374151; /* text-gray-700 */
+        }
+        .form-container input[type="text"],
+        .form-container input[type="date"] {
+            margin-top: 0.25rem;
+            display: block;
+            width: 100%;
+            border-radius: 0.375rem; /* rounded-md */
+            border: 1px solid #d1d5db; /* border-gray-300 */
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05); /* shadow-sm */
+            padding: 0.5rem 0.75rem;
+            box-sizing: border-box; /* Ważne dla 100% width */
+        }
+        .form-container input[type="text"]:focus,
+        .form-container input[type="date"]:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            border-color: #ef4444; /* focus:border-red-500 */
+            box-shadow: 0 0 0 2px #ef4444; /* focus:ring-red-500 */
+        }
+
+        /* --- Przycisk --- */
+        #submitButton {
+            width: 100%;
+            background-color: #16a34a; /* bg-green-600 */
+            color: #ffffff;
+            font-weight: 700; /* font-bold */
+            padding: 0.75rem 1rem; /* py-3 px-4 */
+            border: none;
+            border-radius: 0.5rem; /* rounded-lg */
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); /* shadow-md */
+            cursor: pointer;
+            transition: all 0.3s ease-in-out;
+        }
+        #submitButton:hover {
+            transform: scale(1.05); /* hover:scale-105 */
+        }
+        #submitButton:focus {
+            outline: 2px solid transparent;
+            outline-offset: 2px;
+            box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.5); /* focus:ring-2 focus:ring-green-500 focus:ring-opacity-75 */
+        }
+
+        #formError {
+            color: #dc2626; /* text-red-600 */
+            font-size: 0.875rem; /* text-sm */
+        }
+
+        /* --- Zakładki --- */
+        .tabs-nav {
+            margin-top: 2rem; /* mt-8 */
+            border-bottom: 1px solid #e5e7eb; /* border-b border-gray-200 */
+        }
+        .tabs-nav nav {
+            margin-bottom: -1px; /* -mb-px */
+            display: flex;
+            gap: 1.5rem; /* space-x-6 */
+        }
+        .tabs-nav button {
+            padding: 1rem 0.25rem; /* py-4 px-1 */
+            border: 2px solid transparent; /* border-b-2 */
+            border-bottom-color: transparent;
+            font-weight: 500; /* font-medium */
+            font-size: 0.875rem; /* text-sm */
+            color: #6b7280; /* text-gray-500 */
+            background: none;
+            cursor: pointer;
+        }
+        .tabs-nav button:hover {
+            color: #374151; /* hover:text-gray-700 */
+            border-bottom-color: #d1d5db; /* hover:border-gray-300 */
+        }
+        .tabs-nav button.tab-active {
+            border-bottom-color: #dc2626; /* red-600 */
+            color: #dc2626;
+            font-weight: 700;
+        }
+
+        .views-container {
+            margin-top: 1.5rem; /* mt-6 */
+        }
+
+        /* --- Widok Listy --- */
+        #listView h2 {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 600; /* font-semibold */
+            color: #1f2937; /* text-gray-800 */
+            margin-bottom: 1rem; /* mb-4 */
+        }
+        #availabilityList {
+            display: grid;
+            gap: 0.75rem; /* space-y-3 */
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        #availabilityList li {
+            padding: 1rem; /* p-4 */
+            background-color: #f0fdf4; /* bg-green-50 */
+            border: 1px solid #bbf7d0; /* border-green-200 */
+            border-radius: 0.5rem; /* rounded-lg */
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        #availabilityList li .name {
+            font-weight: 500; /* font-medium */
+            color: #1f2937; /* text-gray-800 */
+        }
+        #availabilityList li .date {
+            font-size: 0.875rem; /* text-sm */
+            color: #15803d; /* text-green-700 */
+        }
+        #emptyListMessage {
+            color: #6b7280; /* text-gray-500 */
+        }
+
+        /* --- Widok Kalendarza --- */
+        #calendarHeader {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 1rem; /* mb-4 */
+        }
+        #calendarHeader button {
+            padding: 0.5rem; /* p-2 */
+            border-radius: 9999px; /* rounded-full */
+            border: none;
+            background: none;
+            cursor: pointer;
+        }
+        #calendarHeader button:hover {
+            background-color: #f3f4f6; /* hover:bg-gray-100 */
+        }
+        #calendarHeader button svg {
+            width: 1.25rem; /* w-5 */
+            height: 1.25rem; /* h-5 */
+            stroke: #374151; /* stroke-currentColor */
+        }
+        #monthYear {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 700; /* font-bold */
+            color: #b91c1c; /* text-red-700 */
+        }
+
+        .calendar-grid-container {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 0.25rem; /* gap-1 */
+        }
+        #calendarDayHeaders {
+            text-align: center;
+            font-size: 0.75rem; /* text-xs */
+            color: #6b7280; /* text-gray-500 */
+            text-transform: uppercase;
+            font-weight: 500; /* font-medium */
+            margin-bottom: 0.5rem; /* mb-2 */
+        }
+        #calendarGrid .calendar-day {
+            min-height: 100px;
+            padding: 0.5rem; /* p-2 */
+            border: 1px solid #e5e7eb; /* border-gray-200 */
+            border-radius: 0.5rem; /* rounded-lg */
+            transition: all 0.2s;
+            background-color: #ffffff;
+            box-sizing: border-box;
+        }
+        #calendarGrid .calendar-day.today {
+            background-color: #fee2e2; /* bg-red-100 */
+            border-color: #fca5a5; /* border-red-300 */
+        }
+        #calendarGrid .calendar-day.has-entry {
+            background-color: #dcfce7; /* bg-green-100 */
+            border-color: #86efac; /* border-green-300 */
+        }
+        #calendarGrid .calendar-day-empty {
+            background-color: #f9fafb; /* bg-gray-50 */
+            border-radius: 0.5rem;
+            min-height: 100px;
+        }
+        .calendar-day-header {
+            font-weight: 700; /* font-bold */
+            color: #374151; /* text-gray-700 */
+            font-size: 0.875rem; /* text-sm */
+        }
+        .calendar-entry-list {
+            margin-top: 0.25rem; /* mt-1 */
+            display: grid;
+            gap: 0.25rem; /* space-y-1 */
+            max-height: 5rem; /* max-h-20 */
+            overflow-y: auto;
+        }
+        .calendar-entry {
+            font-size: 0.75rem; /* text-xs */
+            color: #14532d; /* text-green-800 */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
     </style>
 </head>
 <body class="bg-gray-100 min-h-screen flex items-center justify-center p-4">
 
-    <div class="bg-white rounded-2xl shadow-xl w-full max-w-lg mx-auto overflow-hidden">
-        
-        <!-- Nagłówek -->
-        <div class="p-6 md:p-8 bg-red-700 text-white flex items-center justify-center">
-            <!-- Ikona choinki została usunięta -->
-            <h1 class="font-lobster text-4xl">Święta u Tarantowiczów</h1>
+<!--
+  ZMIANA: Użyto prostych nazw klas CSS zamiast klas Tailwind.
+-->
+<div class="app-container">
+
+    <!-- Nagłówek -->
+    <div class="app-header">
+        <h1 class="font-lobster">Święta u Tarantowiczów</h1>
+    </div>
+
+    <div class="app-content">
+        <!-- Formularz dodawania -->
+        <form id="availabilityForm" class="form-container">
+            <div>
+                <label for="name">Imię:</label>
+                <input type="text" id="name" name="name" required placeholder="Np. Jan Kowalski">
+            </div>
+            <div>
+                <label for="date">Dostępna data:</label>
+                <input type="date" id="date" name="date" required>
+            </div>
+            <div id="formError" class="view-hidden"></div>
+
+            <!-- Przycisk jest teraz w 100% stylowany przez CSS w <style> -->
+            <button type="submit" id="submitButton">
+                Dodaj dostępność 🎄
+            </button>
+        </form>
+
+        <!-- Zakładki -->
+        <div class="tabs-nav">
+            <nav aria-label="Tabs">
+                <button id="tabList" data-view="listView" class="tab-active">
+                    Lista
+                </button>
+                <button id="tabCalendar" data-view="calendarView">
+                    Kalendarz
+                </button>
+            </nav>
         </div>
 
-        <div class="p-6 md:p-8">
-            <!-- Formularz dodawania -->
-            <form id="availabilityForm" class="space-y-4">
-                <div>
-                    <label for="name" class="block text-sm font-medium text-gray-700">Imię:</label>
-                    <input type="text" id="name" name="name" required
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm"
-                           placeholder="Np. Jan Kowalski">
-                </div>
-                <div>
-                    <label for="date" class="block text-sm font-medium text-gray-700">Dostępna data:</label>
-                    <input type="date" id="date" name="date" required
-                           class="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-red-500 focus:ring-red-500 sm:text-sm">
-                </div>
-                <div id="formError" class="text-red-600 text-sm view-hidden"></div>
-                <button type="submit"
-                        class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg shadow-md transform hover:scale-105 transition-all duration-300 ease-in-out focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-75">
-                    Dodaj dostępność 🎄
-                </button>
-            </form>
-
-            <!-- Zakładki -->
-            <div class="mt-8 border-b border-gray-200">
-                <nav class="-mb-px flex space-x-6" aria-label="Tabs">
-                    <button id="tabList" class="py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300 tab-active" data-view="listView">
-                        Lista
-                    </button>
-                    <button id="tabCalendar" class="py-4 px-1 border-b-2 font-medium text-sm text-gray-500 hover:text-gray-700 hover:border-gray-300" data-view="calendarView">
-                        Kalendarz
-                    </button>
-                </nav>
+        <!-- Widoki (Lista i Kalendarz) -->
+        <div id="viewsContainer" class="views-container">
+            <!-- Widok Listy -->
+            <div id="listView">
+                <h2>Zgłoszone daty:</h2>
+                <ul id="availabilityList">
+                    <li id="emptyListMessage">Jeszcze nikt się nie zgłosił...</li>
+                </ul>
             </div>
 
-            <!-- Widoki (Lista i Kalendarz) -->
-            <div id="viewsContainer" class="mt-6">
-                <!-- Widok Listy -->
-                <div id="listView">
-                    <h2 class="text-xl font-semibold text-gray-800 mb-4">Zgłoszone daty:</h2>
-                    <ul id="availabilityList" class="space-y-3">
-                        <li id="emptyListMessage" class="text-gray-500">Jeszcze nikt się nie zgłosił...</li>
-                    </ul>
+            <!-- Widok Kalendarza -->
+            <div id="calendarView" class="view-hidden">
+                <!-- Nagłówek Kalendarza -->
+                <div id="calendarHeader">
+                    <button id="prevMonth">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    </button>
+                    <h2 id="monthYear"></h2>
+                    <button id="nextMonth">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                    </button>
                 </div>
 
-                <!-- Widok Kalendarza -->
-                <div id="calendarView" class="view-hidden">
-                    <!-- Nagłówek Kalendarza -->
-                    <div id="calendarHeader" class="flex items-center justify-between mb-4">
-                        <button id="prevMonth" class="p-2 rounded-full hover:bg-gray-100">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                        </button>
-                        <h2 id="monthYear" class="text-xl font-bold text-red-700"></h2>
-                        <button id="nextMonth" class="p-2 rounded-full hover:bg-gray-100">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
-                        </button>
-                    </div>
-                    
-                    <!-- Siatka Kalendarza -->
-                    <div id="calendarDayHeaders" class="grid grid-cols-7 gap-1 text-center text-xs text-gray-500 uppercase font-medium mb-2">
-                        <span>Pon</span>
-                        <span>Wto</span>
-                        <span>Śro</span>
-                        <span>Czw</span>
-                        <span>Pią</span>
-                        <span>Sob</span>
-                        <span>Nie</span>
-                    </div>
-                    <div id="calendarGrid" class="grid grid-cols-7 gap-1">
-                        <!-- Komórki kalendarza będą generowane przez JS -->
-                    </div>
+                <!-- Siatka Kalendarza -->
+                <div id="calendarDayHeaders" class="calendar-grid-container">
+                    <span>Pon</span>
+                    <span>Wto</span>
+                    <span>Śro</span>
+                    <span>Czw</span>
+                    <span>Pią</span>
+                    <span>Sob</span>
+                    <span>Nie</span>
+                </div>
+                <div id="calendarGrid" class="calendar-grid-container">
+                    <!-- Komórki kalendarza będą generowane przez JS -->
                 </div>
             </div>
         </div>
     </div>
+</div>
 
-    <script type="module">
-        // Import funkcji Firebase
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, onSnapshot, query, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+<script type="module">
+    // Import funkcji Firebase
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+    import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+    import { getFirestore, collection, addDoc, onSnapshot, query, setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- Stan Aplikacji ---
-            let availability = []; // Lokalna kopia danych, synchronizowana z Firebase
-            let currentDate = new Date(); // Data do kontrolowania widoku kalendarza
-            let currentView = 'listView';
+    document.addEventListener('DOMContentLoaded', () => {
+        // --- Stan Aplikacji ---
+        let availability = []; // Lokalna kopia danych, synchronizowana z Firebase
+        let currentDate = new Date(); // Data do kontrolowania widoku kalendarza
+        let currentView = 'listView';
 
-            // --- Zmienne Firebase ---
-            let db, auth, appId;
-            let availabilityCollectionRef; // Referencja do kolekcji w Firestore
+        // --- Zmienne Firebase ---
+        let db, auth, appId;
+        let availabilityCollectionRef; // Referencja do kolekcji w Firestore
 
-            // --- Elementy DOM ---
-            const form = document.getElementById('availabilityForm');
-            const nameInput = document.getElementById('name');
-            const dateInput = document.getElementById('date');
-            const formError = document.getElementById('formError');
+        // --- Elementy DOM ---
+        const form = document.getElementById('availabilityForm');
+        const nameInput = document.getElementById('name');
+        const dateInput = document.getElementById('date');
+        const formError = document.getElementById('formError');
+        const submitButton = document.getElementById('submitButton');
 
-            const availabilityList = document.getElementById('availabilityList');
-            const emptyListMessage = document.getElementById('emptyListMessage');
+        const availabilityList = document.getElementById('availabilityList');
+        const emptyListMessage = document.getElementById('emptyListMessage');
 
-            const tabList = document.getElementById('tabList');
-            const tabCalendar = document.getElementById('tabCalendar');
-            const listView = document.getElementById('listView');
-            const calendarView = document.getElementById('calendarView');
+        const tabList = document.getElementById('tabList');
+        const tabCalendar = document.getElementById('tabCalendar');
+        const listView = document.getElementById('listView');
+        const calendarView = document.getElementById('calendarView');
 
-            const prevMonthBtn = document.getElementById('prevMonth');
-            const nextMonthBtn = document.getElementById('nextMonth');
-            const monthYearDisplay = document.getElementById('monthYear');
-            const calendarGrid = document.getElementById('calendarGrid');
+        const prevMonthBtn = document.getElementById('prevMonth');
+        const nextMonthBtn = document.getElementById('nextMonth');
+        const monthYearDisplay = document.getElementById('monthYear');
+        const calendarGrid = document.getElementById('calendarGrid');
 
-            const polishMonths = [
-                'Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec',
-                'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'
-            ];
-            
-            // --- Logika Formularza (zaktualizowana o Firebase) ---
-            form.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const name = nameInput.value.trim();
-                const date = dateInput.value;
+        const polishMonths = [
+            'Styczeń', 'Luty', 'Marzec', 'Kwiecień', 'Maj', 'Czerwiec',
+            'Lipiec', 'Sierpień', 'Wrzesień', 'Październik', 'Listopad', 'Grudzień'
+        ];
 
-                if (!name || !date) {
-                    showError('Proszę wypełnić oba pola.');
-                    return;
-                }
-                
-                // Sprawdzenie, czy ta osoba już nie podała tej daty (na podstawie lokalnej kopii)
-                const existingEntry = availability.find(entry => entry.name === name && entry.date === date);
-                if (existingEntry) {
-                    showError('Już dodałeś tę datę.');
-                    return;
-                }
+        // --- Logika Formularza (zaktualizowana o Firebase) ---
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const name = nameInput.value.trim();
+            const date = dateInput.value;
 
-                // Sprawdź, czy referencja do kolekcji jest gotowa
-                if (!availabilityCollectionRef) {
-                    showError('Baza danych nie jest gotowa, spróbuj za chwilę.');
-                    return;
-                }
-
-                try {
-                    // Dodaj nowy dokument do Firestore
-                    await addDoc(availabilityCollectionRef, {
-                        name: name,
-                        date: date
-                    });
-                    
-                    // Sukces - wyczyść pola. onSnapshot zajmie się resztą.
-                    hideError();
-                    nameInput.value = '';
-                    dateInput.value = '';
-
-                } catch (err) {
-                    console.error("Error adding document: ", err);
-                    showError('Błąd podczas dodawania daty.');
-                }
-                
-                // Nie ma potrzeby ręcznej aktualizacji stanu (availability.push)
-                // ani ręcznego renderowania (renderList, renderCalendar)
-                // - onSnapshot zrobi to automatycznie.
-            });
-            
-            function showError(message) {
-                formError.textContent = message;
-                formError.classList.remove('view-hidden');
-            }
-            
-            function hideError() {
-                formError.classList.add('view-hidden');
+            if (!name || !date) {
+                showError('Proszę wypełnić oba pola.');
+                return;
             }
 
-            // --- Logika Przełączania Widoków (Zakładek) ---
-            tabList.addEventListener('click', () => switchView('listView'));
-            tabCalendar.addEventListener('click', () => switchView('calendarView'));
-
-            function switchView(view) {
-                currentView = view;
-                if (view === 'listView') {
-                    listView.classList.remove('view-hidden');
-                    calendarView.classList.add('view-hidden');
-                    tabList.classList.add('tab-active');
-                    tabCalendar.classList.remove('tab-active');
-                } else {
-                    listView.classList.add('view-hidden');
-                    calendarView.classList.remove('view-hidden');
-                    tabList.classList.remove('tab-active');
-                    tabCalendar.classList.add('tab-active');
-                    renderCalendar(); // Prerenderuj kalendarz przy przełączeniu
-                }
+            const existingEntry = availability.find(entry => entry.name === name && entry.date === date);
+            if (existingEntry) {
+                showError('Już dodałeś tę datę.');
+                return;
             }
-            
-            // --- Logika Widoku Listy ---
-            function renderList() {
-                availabilityList.innerHTML = ''; // Wyczyść listę (oprócz wiadomości startowej)
 
-                if (availability.length === 0) {
-                    availabilityList.appendChild(emptyListMessage);
-                    return;
-                }
+            if (!availabilityCollectionRef) {
+                showError('Baza danych nie jest gotowa, spróbuj za chwilę.');
+                return;
+            }
 
-                availability.forEach(entry => {
-                    const li = document.createElement('li');
-                    li.className = 'p-4 bg-green-50 border border-green-200 rounded-lg flex justify-between items-center';
-                    
-                    const formattedDate = new Date(entry.date).toLocaleDateString('pl-PL', {
-                        year: 'numeric',
-                        month: 'long',
-                        day: 'numeric'
-                    });
-                    
-                    li.innerHTML = `
-                        <span class="font-medium text-gray-800">${entry.name}</span>
-                        <span class="text-sm text-green-700">${formattedDate}</span>
-                    `;
-                    availabilityList.appendChild(li);
+            try {
+                await addDoc(availabilityCollectionRef, {
+                    name: name,
+                    date: date
                 });
+
+                hideError();
+                nameInput.value = '';
+                dateInput.value = '';
+
+            } catch (err) {
+                console.error("Error adding document: ", err);
+                showError('Błąd podczas dodawania daty.');
+            }
+        });
+
+        function showError(message) {
+            formError.textContent = message;
+            formError.classList.remove('view-hidden');
+        }
+
+        function hideError() {
+            formError.classList.add('view-hidden');
+        }
+
+        // --- Logika Przełączania Widoków (Zakładek) ---
+        tabList.addEventListener('click', () => switchView('listView'));
+        tabCalendar.addEventListener('click', () => switchView('calendarView'));
+
+        function switchView(view) {
+            currentView = view;
+            if (view === 'listView') {
+                listView.classList.remove('view-hidden');
+                calendarView.classList.add('view-hidden');
+                tabList.classList.add('tab-active');
+                tabCalendar.classList.remove('tab-active');
+            } else {
+                listView.classList.add('view-hidden');
+                calendarView.classList.remove('view-hidden');
+                tabList.classList.remove('tab-active');
+                tabCalendar.classList.add('tab-active');
+                renderCalendar();
+            }
+        }
+
+        // --- Logika Widoku Listy ---
+        function renderList() {
+            availabilityList.innerHTML = '';
+
+            if (availability.length === 0) {
+                availabilityList.appendChild(emptyListMessage);
+                return;
             }
 
-            // --- Logika Kalendarza ---
-            prevMonthBtn.addEventListener('click', () => {
-                currentDate.setMonth(currentDate.getMonth() - 1);
-                renderCalendar();
+            availability.forEach(entry => {
+                const li = document.createElement('li');
+
+                const formattedDate = new Date(entry.date + 'T00:00:00').toLocaleDateString('pl-PL', { // Upewnij się, że data jest poprawnie parsowana
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                li.innerHTML = `
+                        <span class="name">${entry.name}</span>
+                        <span class="date">${formattedDate}</span>
+                    `;
+                availabilityList.appendChild(li);
             });
+        }
 
-            nextMonthBtn.addEventListener('click', () => {
-                currentDate.setMonth(currentDate.getMonth() + 1);
-                renderCalendar();
-            });
+        // --- Logika Kalendarza ---
+        prevMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() - 1);
+            renderCalendar();
+        });
 
-            function renderCalendar() {
-                const month = currentDate.getMonth();
-                const year = currentDate.getFullYear();
-                const today = new Date(); // Do podświetlenia dzisiejszego dnia
+        nextMonthBtn.addEventListener('click', () => {
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            renderCalendar();
+        });
 
-                monthYearDisplay.textContent = `${polishMonths[month]} ${year}`;
-                calendarGrid.innerHTML = '';
+        function renderCalendar() {
+            const month = currentDate.getMonth();
+            const year = currentDate.getFullYear();
+            const today = new Date();
 
-                const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0 = Niedziela, 1 = Poniedziałek, ...
-                const daysInMonth = new Date(year, month + 1, 0).getDate();
+            monthYearDisplay.textContent = `${polishMonths[month]} ${year}`;
+            calendarGrid.innerHTML = '';
 
-                // Dostosowanie do startu od poniedziałku (0=Pon, 1=Wto, ..., 6=Nie)
-                const startDay = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
+            const firstDayOfMonth = new Date(year, month, 1).getDay();
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-                // 1. Dodaj puste komórki na początku
-                for (let i = 0; i < startDay; i++) {
-                    const emptyCell = document.createElement('div');
-                    emptyCell.className = 'bg-gray-50 rounded';
-                    calendarGrid.appendChild(emptyCell);
+            const startDay = (firstDayOfMonth === 0) ? 6 : firstDayOfMonth - 1;
+
+            // 1. Dodaj puste komórki na początku
+            for (let i = 0; i < startDay; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'calendar-day-empty';
+                calendarGrid.appendChild(emptyCell);
+            }
+
+            // 2. Dodaj komórki dni
+            for (let day = 1; day <= daysInMonth; day++) {
+                const cell = document.createElement('div');
+                const cellDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+                const entriesForDay = availability.filter(entry => entry.date === cellDateStr);
+
+                let cellClasses = 'calendar-day ';
+
+                if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
+                    cellClasses += 'today ';
                 }
 
-                // 2. Dodaj komórki dni
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const cell = document.createElement('div');
-                    const cellDateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-                    
-                    const entriesForDay = availability.filter(entry => entry.date === cellDateStr);
-                    
-                    let cellClasses = 'calendar-day p-2 border rounded-lg transition-colors duration-200 ';
-                    
-                    // Podświetl dzisiejszy dzień
-                    if (day === today.getDate() && month === today.getMonth() && year === today.getFullYear()) {
-                        cellClasses += 'bg-red-100 border-red-300 ';
-                    } else {
-                        cellClasses += 'bg-white border-gray-200 ';
-                    }
-                    
-                    // Podświetl dni z dostępnością
-                    if (entriesForDay.length > 0) {
-                        cellClasses += 'bg-green-100 border-green-300 ';
-                    }
+                if (entriesForDay.length > 0) {
+                    cellClasses += 'has-entry ';
+                }
 
-                    cell.className = cellClasses;
-                    
-                    let namesHTML = '';
-                    if (entriesForDay.length > 0) {
-                        namesHTML = entriesForDay
-                            .map(e => `<div class="text-xs text-green-800 truncate" title="${e.name}">${e.name}</div>`)
-                            .join('');
-                    }
+                cell.className = cellClasses.trim();
 
-                    cell.innerHTML = `
-                        <div class="font-bold text-gray-700 text-sm">${day}</div>
-                        <div class="mt-1 space-y-1 max-h-20 overflow-y-auto">
+                let namesHTML = '';
+                if (entriesForDay.length > 0) {
+                    namesHTML = entriesForDay
+                        .map(e => `<div class="calendar-entry" title="${e.name}">${e.name}</div>`)
+                        .join('');
+                }
+
+                cell.innerHTML = `
+                        <div class="calendar-day-header">${day}</div>
+                        <div class="calendar-entry-list">
                             ${namesHTML}
                         </div>
                     `;
-                    calendarGrid.appendChild(cell);
-                }
+                calendarGrid.appendChild(cell);
             }
+        }
 
-            // --- Inicjalizacja Firebase i Aplikacji ---
-            
-            async function initFirebase() {
-                try {
-                    // Wstrzykiwane zmienne konfiguracyjne
-                    const firebaseConfigStr = typeof __firebase_config !== 'undefined' ? __firebase_config : '{}';
-                    const firebaseConfig = JSON.parse(firebaseConfigStr);
-                    appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        // --- Inicjalizacja Firebase i Aplikacji ---
 
-                    if (firebaseConfigStr === '{}') {
-                        console.warn('Brak konfiguracji Firebase.');
-                        showError('Brak konfiguracji bazy danych.');
-                        return;
-                    }
-                    
-                    // Inicjalizacja Firebase
-                    const app = initializeApp(firebaseConfig);
-                    db = getFirestore(app);
-                    auth = getAuth(app);
-                    
-                    // Włączenie logowania dla debugowania
-                    // setLogLevel('Debug');
+        async function initFirebase() {
+            try {
+                const firebaseConfig = {
+                    apiKey: "AIzaSyDpwTow8SYbYUI5mSMms_aFNAEm8rO8KeU",
+                    authDomain: "private-e4d45.firebaseapp.com",
+                    projectId: "private-e4d45",
+                    storageBucket: "private-e4d45.firebasestorage.app",
+                    messagingSenderId: "956442155145",
+                    appId: "1:956442155145:web:0e87c39cd9698eae8a4e58",
+                    measurementId: "G-LZ4ZWVYVB9"
+                };
 
-                    // Logowanie (anonimowe lub tokenem)
-                    if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                        await signInWithCustomToken(auth, __initial_auth_token);
-                    } else {
-                        await signInAnonymously(auth);
-                    }
-                    
-                    console.log('Firebase Auth OK.');
+                appId = firebaseConfig.projectId || 'default-app-id';
 
-                    // Zdefiniowanie ścieżki do kolekcji (publicznej dla tej aplikacji)
-                    const collectionPath = `/artifacts/${appId}/public/data/availability`;
-                    availabilityCollectionRef = collection(db, collectionPath);
-                    
-                    // --- Ustawienie nasłuchu na zmiany (real-time) ---
-                    const q = query(availabilityCollectionRef);
-                    
-                    onSnapshot(q, (snapshot) => {
-                        console.log("Otrzymano aktualizację z Firestore");
-                        availability = []; // Wyczyść lokalną tablicę
-                        snapshot.forEach((doc) => {
-                            availability.push(doc.data());
-                        });
-                        
-                        // Sortowanie datami dla porządku na liście
-                        availability.sort((a, b) => new Date(a.date) - new Date(b.date));
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
 
-                        // Prerenderuj oba widoki z nowymi danymi
-                        renderList();
-                        renderCalendar();
-                        
-                    }, (error) => {
-                        console.error("Błąd nasłuchu onSnapshot: ", error);
-                        showError("Błąd synchronizacji danych.");
+                // setLogLevel('Debug');
+
+                await signInAnonymously(auth);
+
+                console.log('Firebase Auth OK (zalogowano anonimowo).');
+
+                const collectionPath = `availability`;
+                availabilityCollectionRef = collection(db, collectionPath);
+
+                // --- Ustawienie nasłuchu na zmiany (real-time) ---
+                const q = query(availabilityCollectionRef);
+
+                onSnapshot(q, (snapshot) => {
+                    console.log("Otrzymano aktualizację z Firestore");
+                    availability = [];
+                    snapshot.forEach((doc) => {
+                        availability.push(doc.data());
                     });
 
-                } catch (err) {
-                    console.error("Błąd inicjalizacji Firebase: ", err);
-                    showError("Nie można połączyć się z bazą danych.");
-                }
-            }
+                    availability.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-            // --- Start Aplikacji ---
-            
-            // Początkowe renderowanie pustych widoków
-            renderList();
-            renderCalendar(); 
-            
-            // Rozpocznij łączenie z Firebase
-            initFirebase();
-        });
-    </script>
+                    renderList();
+                    // Renderuj kalendarz tylko jeśli jest aktywny
+                    if (currentView === 'calendarView') {
+                        renderCalendar();
+                    }
+
+                }, (error) => {
+                    console.error("Błąd nasłuchu onSnapshot: ", error);
+                    showError("Błąd synchronizacji danych.");
+                });
+
+            } catch (err) {
+                console.error("Błąd inicjalizacji Firebase: ", err);
+                showError("Nie można połączyć się z bazą danych.");
+            }
+        }
+
+        // --- Start Aplikacji ---
+        renderList();
+        renderCalendar();
+        initFirebase();
+    });
+</script>
 </body>
 </html>
